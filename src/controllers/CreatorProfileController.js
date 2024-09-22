@@ -65,7 +65,9 @@ const deleteCreatorProfile = async (req, res) => {
 
 const creatorProfileByUserId = async (req, res) => {
   try {
-    const profile = await CreatorProfile.findOne({ user: req.params.id}).populate("user");
+    const profile = await CreatorProfile.findOne({
+      user: req.params.id,
+    }).populate("user");
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
@@ -77,17 +79,22 @@ const creatorProfileByUserId = async (req, res) => {
 
 const updateExperiance = async (req, res) => {
   try {
-    const { experienceId, role, company, duration, location, workDetails } = req.body;
+    const { experienceId, role, company, duration, location, workDetails } =
+      req.body;
 
     // Find the profile by ID
-    const profile = await CreatorProfile.findById(req.params.id).populate("user");
+    const profile = await CreatorProfile.findById(req.params.id).populate(
+      "user"
+    );
 
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
 
     // Check if the experience already exists in the array
-    const experienceIndex = profile.experience.findIndex(exp => exp._id.toString() === experienceId);
+    const experienceIndex = profile.experience.findIndex(
+      (exp) => exp._id.toString() === experienceId
+    );
 
     if (experienceIndex !== -1) {
       // Update existing experience
@@ -97,7 +104,7 @@ const updateExperiance = async (req, res) => {
         company,
         duration,
         location,
-        workDetails
+        workDetails,
       };
     } else {
       // Push new experience if not found
@@ -106,7 +113,7 @@ const updateExperiance = async (req, res) => {
         company,
         duration,
         location,
-        workDetails
+        workDetails,
       });
     }
 
@@ -124,14 +131,18 @@ const removeExperience = async (req, res) => {
     const { experienceId } = req.body;
 
     // Find the profile by ID
-    const profile = await CreatorProfile.findById(req.params.id).populate("user");
+    const profile = await CreatorProfile.findById(req.params.id).populate(
+      "user"
+    );
 
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
 
     // Filter out the experience with the given experienceId
-    const updatedExperience = profile.experience.filter(exp => exp._id.toString() !== experienceId);
+    const updatedExperience = profile.experience.filter(
+      (exp) => exp._id.toString() !== experienceId
+    );
 
     if (updatedExperience.length === profile.experience.length) {
       return res.status(404).json({ message: "Experience not found" });
@@ -143,7 +154,9 @@ const removeExperience = async (req, res) => {
     // Save the updated profile
     const updatedProfile = await profile.save();
 
-    res.status(200).json({ message: "Experience removed successfully", updatedProfile });
+    res
+      .status(200)
+      .json({ message: "Experience removed successfully", updatedProfile });
   } catch (error) {
     res.status(500).json({ message: "Error removing experience", error });
   }
@@ -151,17 +164,31 @@ const removeExperience = async (req, res) => {
 
 const updateProject = async (req, res) => {
   try {
-    const { projectId, title, date, description, repoLink, cloneLink, starts, forks, updatedOn } = req.body;
+    const {
+      projectId,
+      title,
+      date,
+      description,
+      repoLink,
+      cloneLink,
+      starts,
+      forks,
+      updatedOn,
+    } = req.body;
 
     // Find the profile by ID
-    const profile = await CreatorProfile.findById(req.params.id).populate('user');
+    const profile = await CreatorProfile.findById(req.params.id).populate(
+      "user"
+    );
 
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
 
     // Check if the project already exists in the array
-    const projectIndex = profile.projects.findIndex(proj => proj._id.toString() === projectId);
+    const projectIndex = profile.projects.findIndex(
+      (proj) => proj._id.toString() === projectId
+    );
 
     if (projectIndex !== -1) {
       // Update existing project
@@ -204,14 +231,18 @@ const removeProject = async (req, res) => {
     const { projectId } = req.body;
 
     // Find the profile by ID
-    const profile = await CreatorProfile.findById(req.params.id).populate('user');
+    const profile = await CreatorProfile.findById(req.params.id).populate(
+      "user"
+    );
 
     if (!profile) {
       return res.status(404).json({ message: "Profile not found" });
     }
 
     // Filter out the project to be removed
-    profile.projects = profile.projects.filter(proj => proj._id.toString() !== projectId);
+    profile.projects = profile.projects.filter(
+      (proj) => proj._id.toString() !== projectId
+    );
 
     // Save the updated profile
     const updatedProfile = await profile.save();
@@ -221,8 +252,134 @@ const removeProject = async (req, res) => {
     res.status(500).json({ message: "Error removing project", error });
   }
 };
+const removeEducation = async (req, res) => {
+  try {
+    const { educationId } = req.body;
 
+    // Find the profile by ID
+    const profile = await CreatorProfile.findById(req.params.id).populate(
+      "user"
+    );
 
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // Filter out the education entry to be removed
+    profile.education = profile.education.filter(
+      (edu) => edu._id.toString() !== educationId
+    );
+
+    // Save the updated profile
+    const updatedProfile = await profile.save();
+
+    res.status(200).json(updatedProfile);
+  } catch (error) {
+    res.status(500).json({ message: "Error removing education", error });
+  }
+};
+
+const deletePortfolio = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedPortfolio = await CreatorProfile.findByIdAndDelete(id);
+    if (!deletedPortfolio) {
+      return res.status(404).json({ message: "Portfolio not found" });
+    }
+    res.status(200).json({ message: "Portfolio deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting portfolio", error });
+  }
+};
+
+// Controller to add education to a creator's profile
+const addEducation = async (req, res) => {
+  try {
+    const { id } = req.params; // The creator profile ID
+    const newEducation = req.body; // New education data
+
+    // Find the profile by ID
+    const profile = await CreatorProfile.findById(id);
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // Push the new education data to the education array
+    profile.education.push(newEducation);
+
+    // Save the updated profile
+    const updatedProfile = await profile.save();
+
+    // Return the updated profile
+    res.status(200).json({
+      message: "Education added successfully",
+      profile: updatedProfile,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding education", error });
+  }
+};
+
+const addSkill = async (req, res) => {
+  try {
+    const { id } = req.params; // The creator profile ID
+    const { name, rating, certification } = req.body; // Destructure skill data
+
+    // Find the profile by ID
+    const profile = await CreatorProfile.findById(id);
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // Create the new skill object
+    const newSkill = { name, rating, certification };
+
+    // Push the new skill to the skills array
+    profile.skills.push(newSkill);
+
+    // Save the updated profile
+    const updatedProfile = await profile.save();
+
+    // Return the updated profile
+    res.status(200).json({
+      message: "Skill added successfully",
+      profile: updatedProfile,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding skill", error });
+  }
+};
+const removeSkill = async (req, res) => {
+  try {
+    const { id } = req.params; // The creator profile ID
+    const { skillId } = req.body; // Skill ID to remove
+
+    // Find the profile by ID
+    const profile = await CreatorProfile.findById(id);
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // Remove the skill from the skills array
+    profile.skills = profile.skills.filter(
+      (skill) => skill._id.toString() !== skillId
+    );
+
+    // Save the updated profile
+    const updatedProfile = await profile.save();
+
+    // Return the updated profile
+    res.status(200).json({
+      message: "Skill removed successfully",
+      profile: updatedProfile,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error removing skill", error });
+  }
+};
 
 module.exports = {
   createCreatorProfile,
@@ -234,5 +391,10 @@ module.exports = {
   updateExperiance,
   removeExperience,
   updateProject,
-  removeProject
+  removeProject,
+  removeEducation,
+  addEducation,
+  addSkill,
+  removeSkill,
+  deletePortfolio,
 };

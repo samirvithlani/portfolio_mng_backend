@@ -25,4 +25,18 @@ router.put("/updateproject/:id", creatorProfileController.updateProject);
 
 router.put("/removeproject/:id", creatorProfileController.removeProject);
 
+router.delete('/profile/:id/education', creatorProfileController.removeEducation);
+
+router.post('/profile/:id/education', creatorProfileController.addEducation);
+
+router.post('/profile/:id/skills', creatorProfileController.addSkill);
+
+router.delete('/profile/:id/skills', creatorProfileController.removeSkill);
+
+router.delete("/delete/:id",creatorProfileController.deletePortfolio);
+
+
+
+
+
 module.exports = router;
