@@ -351,6 +351,46 @@ const addSkill = async (req, res) => {
     res.status(500).json({ message: "Error adding skill", error });
   }
 };
+const addProject = async (req, res) => {
+  try {
+    const { id } = req.params; // The creator profile ID
+    const { title, date, description, repoLink, cloneLink, stars, forks, updatedOn } = req.body; // Destructure project data
+
+    // Find the profile by ID
+    const profile = await CreatorProfile.findById(id);
+
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    // Create the new project object
+    const newProject = {
+      title,
+      date,
+      description,
+      repoLink,
+      cloneLink,
+      stars,
+      forks,
+      updatedOn,
+    };
+
+    // Push the new project to the projects array
+    profile.projects.push(newProject);
+
+    // Save the updated profile
+    const updatedProfile = await profile.save();
+
+    // Return the updated profile
+    res.status(200).json({
+      message: "Project added successfully",
+      profile: updatedProfile,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding project", error });
+  }
+};
+
 const removeSkill = async (req, res) => {
   try {
     const { id } = req.params; // The creator profile ID
@@ -397,4 +437,5 @@ module.exports = {
   addSkill,
   removeSkill,
   deletePortfolio,
+  addProject,
 };

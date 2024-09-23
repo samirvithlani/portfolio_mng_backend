@@ -35,7 +35,7 @@ router.delete('/profile/:id/skills', creatorProfileController.removeSkill);
 
 router.delete("/delete/:id",creatorProfileController.deletePortfolio);
 
-
+router.post("/addproject/:id",creatorProfileController.addProject);
 
 
 
